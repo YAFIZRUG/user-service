@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<!-- 
+Название файла обязательно должно быть с маленькой буквы, для linux-систем это важно. 'hybernate.cfg.xml'
+ -->
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Драйвер базы данных -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+
+        <!-- URL для подключения к БД -->
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>
+
+        <!-- Имя пользователя БД -->
+        <property name="hibernate.connection.username">postgres</property>
+
+        <!-- Пароль пользователя БД -->
+        <property name="hibernate.connection.password">root</property>
+
+        <!-- Диалект SQL -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+
+        <!-- Показывать SQL запросы в консоли -->
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- Стратегия создания DDL -->
+        <property name="hibernate.hbm2ddl.auto">create</property>
+        <!--          
+            Значение	    Описание
+            create-drop	    Создает таблицы при старте, удаляет при завершении (для тестов)
+            create	        Создает таблицы заново каждый раз (удаляет старые данные)
+            update	        Обновляет схему без удаления данных (для разработки)
+            validate	    Проверяет соответствие схемы без изменений
+            none	        Отключает автоматическое управление схемой
+        -->
+
+        <!-- Named entity -->
+        <mapping class="edu.aston.model.User"/>
+    </session-factory>
+</hibernate-configuration>
