@@ -84,14 +84,19 @@ User Service - это консольное Java-приложение для уп
 Проект реализован с использованием DAO-паттерна для разделения ответственности:
 
 ```text
-src/main/java/edu/aston/
-├── Main.java                    # Точка входа в приложение
-├── service/
-│   └── ViewService.java         # Консольный интерфейс пользователя
-├── dao/
-│   ├── UserDao.java            # Интерфейс DAO
-│   └── UserDaoImpl.java        # Реализация DAO через Hibernate
-├── model/
-│   └── User.java               # Сущность пользователя
-└── util/
-    └── HibernateUtil.java      # Утилита для работы с Hibernate```
+src/
+└── main/
+├── java/edu/aston/
+│ ├── Main.java
+│ ├── service/
+│ │ └── ViewService.java
+│ ├── dao/
+│ │ ├── UserDao.java
+│ │ └── UserDaoImpl.java
+│ ├── model/
+│ │ └── User.java
+│ └── util/
+│ └── HibernateUtil.java
+└── resources/
+├── hibernate.cfg.xml
+└── log4j2.xml
