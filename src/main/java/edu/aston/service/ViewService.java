@@ -12,7 +12,7 @@ import edu.aston.model.User;
 
 public class ViewService {
 
-    static private boolean isRunning = true;
+    private static boolean isRunning = true;
     private static Scanner scanner = new Scanner(System.in);
     private static UserDao userDao = new UserDaoImpl();
     private static final Logger logger = LogManager.getLogger(ViewService.class);
@@ -53,7 +53,7 @@ public class ViewService {
         System.out.println();
     }
 
-    private static void addUser() {
+    public static void addUser() {
         try {
             logger.info("Начало операции: создание пользователя");
             System.out.print("\nВведите имя: ");
@@ -77,7 +77,7 @@ public class ViewService {
         }
     }
 
-    private static void showUsers() {
+    public static void showUsers() {
         logger.info("Начало операции: получение списка пользователей");
 
         try {
@@ -111,7 +111,7 @@ public class ViewService {
         }
     }
 
-    private static void deleteUser() {
+    public static void deleteUser() {
         logger.info("Начало операции: удаление пользователя");
 
         try {
@@ -146,7 +146,7 @@ public class ViewService {
         }
     }
 
-    private static void updateUser() {
+    public static void updateUser() {
         logger.info("Начало операции: обновление пользователя");
 
         try {
@@ -201,7 +201,7 @@ public class ViewService {
         }
     }
 
-    private static String checkKey() {
+    public static String checkKey() {
 
         while (true) {
             String input = scanner.nextLine().trim();
