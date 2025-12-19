@@ -1,6 +1,2 @@
-edu\aston\util\HibernateUtil.class
 edu\aston\model\User.class
 edu\aston\Main.class
-edu\aston\service\ViewService.class
-edu\aston\dao\UserDao.class
-edu\aston\dao\UserDaoImpl.class
