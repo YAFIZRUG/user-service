@@ -2,6 +2,7 @@ package edu.aston.controller;
 
 import edu.aston.dto.UserDto;
 import edu.aston.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "main_methods")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
