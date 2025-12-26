@@ -2,6 +2,7 @@ package edu.aston.controller;
 
 import edu.aston.dto.UserDto;
 import edu.aston.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "main_methods")
+@Tag(name = "Основные методы")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "Создание нового пользователя в базу данных")
     @PostMapping
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
         UserDto createdUser = userService.createUser(userDto);
@@ -27,18 +29,21 @@ public class UserController {
                 .body(createdUser);
     }
 
+    @Operation(summary = "Получение пользователя по ID из базы данных")
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         UserDto userDto = userService.getUserById(id);
         return ResponseEntity.ok(userDto);
     }
 
+    @Operation(summary = "Получение списка пользователей из базы данных")
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
+    @Operation(summary = "Изменить информацию о пользователе по ID")
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(
             @PathVariable Long id,
@@ -47,6 +52,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @Operation(summary = "Удалить пользователя по ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -55,6 +61,7 @@ public class UserController {
                 .build();
     }
 
+    @Operation(summary = "Получить пользователя по email")
     @GetMapping("/email/{email}")
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         UserDto userDto = userService.getUserByEmail(email);
