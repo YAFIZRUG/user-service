@@ -1,0 +1,179 @@
+services:
+  # 1. База данных для user-service
+  postgres:
+    image: postgres:15
+    container_name: ms-postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Zookeeper 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: ms-zookeeper
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - ms-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5  
+
+  # 3. Apache Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: ms-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_NUM_PARTITIONS: 1
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+    networks:
+      - ms-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # 4. Spring Cloud Config Server
+  config-server:
+    image: hyness/spring-cloud-config-server:latest
+    container_name: ms-config-server
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config-repo:/config
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCHLOCATIONS: file:/config
+      SPRING_PROFILES_ACTIVE: native
+    networks:
+      - ms-network
+  #   healthcheck:
+  #    test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+  #    interval: 10s
+  #    timeout: 5s
+  #    retries: 10
+  #    start_period: 60s
+    restart: on-failure
+
+ # 5. API Gateway Service
+  gateway:
+    build: ./gateway-service
+    container_name: ms-gateway
+    depends_on:
+      config-server:
+        condition: service_started
+    restart: on-failure:5
+    ports:
+      - "8079:8079"
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_APPLICATION_NAME: gateway-service
+      SPRING_PROFILES_ACTIVE: docker
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_REQUEST_CONNECT_TIMEOUT: 10000
+      SPRING_CLOUD_CONFIG_REQUEST_READ_TIMEOUT: 10000
+
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: 2000
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: 30
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: 5000
+    networks:
+      - ms-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8079/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # 6. User Service
+  user-service:
+    build: ./user-service
+    container_name: ms-user-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-server:8888/"
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_APPLICATION_NAME: user-service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - ms-network
+
+  # 7. Notification Service
+  notification-service:
+    build: ./notification-service
+    container_name: ms-notification-service
+    depends_on:
+      kafka:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-server:8888/"
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_APPLICATION_NAME: notification-service
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC_USER_EVENTS: user.events
+    networks:
+      - ms-network
+
+# Определение сети для изоляции сервисов
+networks:
+  ms-network:
+    driver: bridge
+
+# Тома для хранения данных PostgreSQL
+volumes:
+  postgres_data:
