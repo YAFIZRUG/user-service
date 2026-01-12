@@ -1,2 +1,11 @@
+edu\aston\service\UserService.class
+edu\aston\config\OpenApiConfig.class
 edu\aston\model\User.class
+edu\aston\dto\UserEvent$Operation.class
+edu\aston\config\KafkaProducerConfig.class
+edu\aston\controller\UserController.class
+edu\aston\dto\UserDto.class
+edu\aston\exeption\GlobalExceptionHandler.class
 edu\aston\Main.class
+edu\aston\dto\UserEvent.class
+edu\aston\repository\UserRepository.class

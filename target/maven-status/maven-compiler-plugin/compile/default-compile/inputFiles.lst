@@ -1,3 +1,4 @@
+C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\config\KafkaProducerConfig.java
 C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\controller\UserController.java
 C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\dto\UserDto.java
 C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\dto\UserEvent.java
@@ -6,3 +7,4 @@ C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\service\User
 C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\exeption\GlobalExceptionHandler.java
 C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\model\User.java
 C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\Main.java
+C:\Users\YAFIZRUG\JavaProjects\user-service\src\main\java\edu\aston\config\OpenApiConfig.java
